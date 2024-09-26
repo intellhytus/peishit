@@ -12,7 +12,6 @@ jobs:
           
       - name: Run Dusk Tests
         run: |
-          chmod -R 0755 vendor/laravel/dusk/bin/
           sail dusk
         env:
           APP_ENV: local
