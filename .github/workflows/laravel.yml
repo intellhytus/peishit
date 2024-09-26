@@ -12,7 +12,7 @@ jobs:
           
       - name: Run Dusk Tests
         run: |
-          sail dusk
+          php artisan dusk
         env:
           APP_ENV: local
           APP_URL: "http://localhost"
