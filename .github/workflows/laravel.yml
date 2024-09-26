@@ -26,14 +26,14 @@ jobs:
           chmod -R 777 storage bootstrap/cache
           npm install
           npm run dev
-          
-      - name: Upgrade Chrome Driver
-        run: php artisan dusk:chrome-driver
 
       - name: Install Dusk
         run: |
           composer require laravel/dusk --dev
           php artisan dusk:install
+          
+      - name: Upgrade Chrome Driver
+        run: php artisan dusk:chrome-driver
 
       - name: Start Chrome Driver
         run: ./vendor/laravel/dusk/bin/chromedriver-linux > /dev/null 2>&1 &
