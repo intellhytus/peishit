@@ -1,0 +1,48 @@
+
+name: Continuos Integration for Laravel Dusk
+on: [push]
+jobs:
+
+  dusk-php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Prepare The Environment
+        run: cp .env.ci .env
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.2'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Install Composer Dependencies
+        run: |
+          composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+          chmod -R 777 storage bootstrap/cache
+          npm install
+          npm run production
+      - name: Generate Application Key
+        run: |
+          php artisan key:generate
+          php artisan passport:keys
+
+      - name: Run Dusk Tests
+        run: |
+          chmod -R 0755 vendor/laravel/dusk/bin/
+          sail dusk
+        env:
+          APP_ENV: local
+          APP_URL: "http://localhost"
+          DB_CONNECTION: pgsql
+          DB_DATABASE: livetest
+          DB_PORT: 5432
+          DB_USER: sail
+          DB_PASSWORD: password
