@@ -25,7 +25,7 @@ jobs:
           composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
           chmod -R 777 storage bootstrap/cache
           npm install
-          npm run production
+          npm run dev
           
       - name: Generate Application Key
         run: |
