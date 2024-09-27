@@ -1,11 +1,11 @@
 name: Continuous Integration for Laravel Dusk
-on: [push]
-
-jobs:
-
-  inputs:
-    browser: 
-      type: choice
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      browser:
+        type: choice
+        description: Which browser to test
         required: true
         default: chrome
         options:
@@ -13,6 +13,7 @@ jobs:
           - firefox
           - edge
 
+jobs:
   dusk-php:
     runs-on: ubuntu-latest
 
@@ -64,38 +65,4 @@ jobs:
           composer require laravel/dusk --dev
           php artisan dusk:install
 
-      - name: Run Laravel Server
-        run: php artisan serve --host=0.0.0.0 --port=8000 &
-        # Garantir que o servidor Laravel esteja rodando na porta 8000
-
-      - name: Wait for Laravel to boot
-        run: sleep 15
-        # Aumentar o tempo de espera para garantir que o servidor esteja totalmente inicializado
-
-      - name: Check Selenium Status
-        run: |
-          for i in {1..30}; do
-            curl -s http://selenium:4444/wd/hub/status && break
-            echo "Aguardando Selenium iniciar..."
-            sleep 2
-          done
-
-      - name: Ping Selenium
-        run: ping -c 4 selenium || echo "Não foi possível pingar o Selenium"
-
-      - name: Curl Selenium
-        run: curl -v http://selenium:4444/wd/hub/status || echo "Não foi possível conectar ao Selenium"
-
-      - name: Run Dusk Tests
-        run: php artisan dusk
-        env:
-          BROWSER: ${{ github.event.inputs.browser }}
-          APP_ENV: local
-          DUSK_DRIVER_URL: "http://selenium:4444/wd/hub"
-          APP_URL: "http://localhost:8000"
-          DB_CONNECTION: mysql
-          DB_DATABASE: dusk
-          DB_PORT: 3306
-          DB_HOST: 127.0.0.1
-          DB_USER: root
-          DB_PASSWORD: ''
+      - name: Run
