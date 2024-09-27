@@ -52,6 +52,9 @@ jobs:
       - name: Run Laravel Server
         run: php artisan serve --host=0.0.0.0 --port=8000 > /dev/null 2>&1 &
 
+      - name: Check Selenium Status
+        run: curl http://selenium:4444/wd/hub/status
+
       - name: Run Dusk Tests
         run: |
           chmod -R 0755 vendor/laravel/dusk/bin/
