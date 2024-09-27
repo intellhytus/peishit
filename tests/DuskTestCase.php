@@ -52,8 +52,8 @@ abstract class DuskTestCase extends BaseTestCase
             '--disable-gpu',
             '--headless',
 //            '--window-size=1920,1080',
-//            '--no-sandbox',
-//            '--disable-dev-shm-usage',
+            '--no-sandbox',
+            '--disable-dev-shm-usage',
         ]);
 
         return RemoteWebDriver::create(
@@ -61,5 +61,28 @@ abstract class DuskTestCase extends BaseTestCase
             ChromeOptions::CAPABILITY, $options
         )
         );
+    }
+
+    protected function waitForSelenium()
+    {
+        $maxAttempts = 30;
+        $attempt = 0;
+        while ($attempt < $maxAttempts) {
+            $attempt++;
+            try {
+                // Verifica se a URL do Selenium está acessível
+                $response = file_get_contents('http://selenium:4444/wd/hub/status');
+                $data = json_decode($response, true);
+                if (isset($data['value']['ready']) && $data['value']['ready']) {
+                    return; // Selenium está pronto
+                }
+            } catch (\Exception $e) {
+                // Ignora a exceção e tenta novamente
+            }
+
+            sleep(1); // Espera um segundo antes de tentar novamente
+        }
+
+        throw new \Exception("Selenium não está pronto após várias tentativas.");
     }
 }
