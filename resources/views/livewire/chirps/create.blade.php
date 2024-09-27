@@ -18,19 +18,17 @@ new class extends Component {
         $this->message = '';
 
         $this->dispatch('chirp-created');
-
     }
 }; ?>
-
 <div>
     <form wire:submit.prevent="store">
-        <textarea
-            wire:model="message"
-            placeholder="{{ __('Poste um peixe!F') }}"
-            class="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+        <textarea wire:model="message"
+                  placeholder="{{'Poste um Peixe!F'}}"
+                  class="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+                  name="chirp"
         ></textarea>
 
         <x-input-error :messages="$errors->get('message')" class="mt-2" />
-        <x-primary-button class="mt-4">{{ __('Peixar') }}</x-primary-button>
+        <x-primary-button dusk="chirps-submit" class="mt-4">Peixar</x-primary-button>
     </form>
 </div>

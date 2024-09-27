@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-//Route::view('/', 'welcome');
+Route::view('/', 'dashboard')->middleware(['auth']);
 
-Route::get('/',[\App\Http\Controllers\ChirpController::class,'index'])
+Route::get('/chirps',[\App\Http\Controllers\ChirpController::class,'index'])
     ->middleware(['auth'])
     ->name('chirps');
 
