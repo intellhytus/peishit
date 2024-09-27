@@ -6,7 +6,6 @@ jobs:
   inputs:
     browser: 
       type: choice
-        description: Which browser to test
         required: true
         default: chrome
         options:
