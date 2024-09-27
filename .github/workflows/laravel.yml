@@ -1,27 +1,31 @@
-name: Continuos Integration for Laravel Dusk
+name: Continuous Integration for Laravel Dusk
 on: [push]
-jobs:
 
+jobs:
   dusk-php:
     runs-on: ubuntu-latest
 
     services:
       selenium:
         image: selenium/standalone-chrome:latest
-        options: > 
-          --network-alias=selenium
         ports:
           - "4444:4444"
-       
+        options: >-
+          --shm-size=2g
+
       mysql:
         image: mariadb:10.2
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: dusk
         ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -33,7 +37,7 @@ jobs:
           php-version: '8.3'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '14.x'
 
@@ -50,13 +54,26 @@ jobs:
           php artisan dusk:install
 
       - name: Run Laravel Server
-        run: php -S 0.0.0.0:8000 -t public &
+        run: php artisan serve --host=0.0.0.0 --port=8000 &
+        # Garantir que o servidor Laravel esteja rodando na porta 8000
 
       - name: Wait for Laravel to boot
-        run: sleep 10
+        run: sleep 15
+        # Aumentar o tempo de espera para garantir que o servidor esteja totalmente inicializado
 
       - name: Check Selenium Status
-        run: curl http://selenium:4444/wd/hub/status
+        run: |
+          for i in {1..30}; do
+            curl -s http://selenium:4444/wd/hub/status && break
+            echo "Aguardando Selenium iniciar..."
+            sleep 2
+          done
+
+      - name: Ping Selenium
+        run: ping -c 4 selenium || echo "Não foi possível pingar o Selenium"
+
+      - name: Curl Selenium
+        run: curl -v http://selenium:4444/wd/hub/status || echo "Não foi possível conectar ao Selenium"
 
       - name: Run Dusk Tests
         run: php artisan dusk
@@ -66,5 +83,7 @@ jobs:
           APP_URL: "http://localhost:8000"
           DB_CONNECTION: mysql
           DB_DATABASE: dusk
-          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+          DB_PORT: 3306
+          DB_HOST: 127.0.0.1
           DB_USER: root
+          DB_PASSWORD: ''
