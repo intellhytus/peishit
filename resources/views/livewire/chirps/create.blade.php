@@ -6,7 +6,6 @@ use Livewire\Volt\Component;
 new class extends Component {
 
     public string $message = '';
-
     public function store(): void
     {
         $validated = $this->validate([
