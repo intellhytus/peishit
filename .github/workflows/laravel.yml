@@ -19,7 +19,7 @@ jobs:
 
     services:
       selenium:
-        image: selenium/standalone-${{ github.event.inputs.browser }}
+        image: selenium/standalone-chrome:latest  # Usando 'chrome' diretamente para teste
         ports:
           - "4444:4444"
         options: >-
