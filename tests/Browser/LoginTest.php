@@ -18,7 +18,7 @@ class LoginTest extends DuskTestCase
             $browser->visit('login')
                 ->type('email', 'test@example.com')
                 ->type('password', 'password')
-                ->press('Entrar')
+                ->press('@entrar')
                 ->resize(1920, 1080)
                 ->screenshot('dashboard');
         });
