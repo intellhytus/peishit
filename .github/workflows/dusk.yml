@@ -70,7 +70,7 @@ jobs:
 
       # Run our Dusk test suite. This could be different if you don't use Pest (e.g. php artisan dusk)
       - name: Execute tests
-        run: php artisan pest:dusk
+        run: sail artisan pest:dusk
 
       # If there's a failure, upload the Dusk screenshots as an artifact
       - name: Upload Screenshots
