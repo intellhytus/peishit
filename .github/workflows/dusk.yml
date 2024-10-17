@@ -71,8 +71,8 @@ jobs:
       # Run our Dusk test suite. This could be different if you don't use Pest (e.g. php artisan dusk)
       - name: Execute tests
         run:
-          sail artisan pest:dusk
           alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
+          sail artisan pest:dusk
 
       # If there's a failure, upload the Dusk screenshots as an artifact
       - name: Upload Screenshots
