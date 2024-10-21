@@ -18,7 +18,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Versão do PHP que você está usando
+          php-version: '8.1' # Altere para a versão PHP que está usando
 
       - name: Install Dependencies
         run: |
@@ -26,11 +26,13 @@ jobs:
           composer install
           php artisan key:generate
 
+      - name: Install Chromedriver
+        run: php artisan dusk:chrome-driver --detect
+
       - name: Run Migrations
-        run: php artisan migrate
+        run: php artisan migrate --force
 
       - name: Run Laravel Dusk Tests
         env:
           APP_URL: http://localhost
-          DB_CONNECTION: sqlite
-        run: php artisan dusk #dusk
+        run: php artisan dusk
