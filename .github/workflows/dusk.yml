@@ -1,54 +1,42 @@
-name: Run Dusk Tests
+name: Laravel Dusk Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   dusk-tests:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: laravel
+      selenium:
+        image: selenium/standalone-chrome:latest
         ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          - 4444:4444
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: 8.2
-        extensions: mbstring, bcmath, zip, mysqli
-        coverage: none
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Versão do PHP que você está usando
 
-    - name: Install Composer dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+      - name: Install Dependencies
+        run: |
+          cp .env.example .env
+          composer install
+          php artisan key:generate
 
-    - name: Copy .env.example to .env
-      run: cp .env.example .env
+      - name: Run Migrations
+        run: php artisan migrate
 
-    - name: Generate app key
-      run: php artisan key:generate
-
-    - name: Configure database
-      run: |
-        php artisan config:clear
-        php artisan config:cache
-
-    - name: Run migrations
-      run: php artisan migrate
-
-    - name: Start Chrome Driver
-      run: php artisan dusk:chrome-driver
-
-    - name: Run Laravel Dusk Tests
-      run: php artisan dusk
+      - name: Run Laravel Dusk Tests
+        env:
+          APP_URL: http://localhost
+          DB_CONNECTION: sqlite
+        run: php artisan dusk
