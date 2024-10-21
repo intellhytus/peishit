@@ -1,87 +1,54 @@
-# The name of your workflow. Name this however you like!
-name: Dusk
+name: Run Dusk Tests
 
-# Run these tests on the push of code
-on: [push]
+on: [push, pull_request]
+
 jobs:
-  dusk:
-    # The operating system to run on
+  dusk-tests:
     runs-on: ubuntu-latest
 
     services:
-      # Set up the Redis service (if you need it)
-      redis:
-        image: redis
+      mysql:
+        image: mysql:8.0
         env:
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: laravel
         ports:
-          - 6379:6379
+          - 3306:3306
         options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
-      # Checks out your repository so your workflow can access it
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-      # Creates the MySQL database with "root" and "root" as the username and password respectively
-      # The database has the same name we specified in .env.dusk.ci
-      - name: Set up MySQL
-        run: |
-          sudo systemctl start mysql
-          mysql --user="root" --password="root" -e "CREATE DATABASE \`codecourse_testing\` character set UTF8mb4 collate utf8mb4_bin;"
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.0
+        extensions: mbstring, bcmath, zip, mysqli
+        coverage: none
 
-      # Setup PHP with a specific version (8.3)
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
 
-      # Copy the .env.dusk.ci file we commited to the .env that'll be used by Laravel
-      - name: Copy .env
-        run: cp .env.dusk.ci .env
+    - name: Copy .env.example to .env
+      run: cp .env.example .env
 
-      # Install Composer dependencies without showing progress, with dist and an optimized autoload (both potentially faster)
-      - name: Install Dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
+    - name: Generate app key
+      run: php artisan key:generate
 
-      # Generate a new application key, which fills in APP_KEY in .env
-      - name: Generate key
-        run: php artisan key:generate
+    - name: Configure database
+      run: |
+        php artisan config:clear
+        php artisan config:cache
 
-      # Install the Chrome binaries required for Dusk to run tests
-      - name: Install Chrome binaries
-        run: php artisan dusk:chrome-driver --detect
+    - name: Run migrations
+      run: php artisan migrate
 
-      # Start the Chrome driver so we're able to run browser tests with Chrome
-      - name: Start Chrome Driver
-        run: ./vendor/laravel/dusk/bin/chromedriver-linux &
+    - name: Start Chrome Driver
+      run: php artisan dusk:chrome-driver
 
-      # Start a basic Laravel server with no reloading
-      - name: Run Laravel Server
-        run: php artisan serve --no-reload &
-
-      # Run our Dusk test suite. This could be different if you don't use Pest (e.g. php artisan dusk)
-      - name: Execute tests
-        run:
-          alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
-          vendor/bin/sail artisan dusk
-
-      # If there's a failure, upload the Dusk screenshots as an artifact
-      - name: Upload Screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots
-          path: tests/Browser/screenshots
-
-      # If there's a failure, upload the Dusk console logs as an artifact
-      - name: Upload Console Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: console
-          path: tests/Browser/console
+    - name: Run Laravel Dusk Tests
+      run: php artisan dusk
