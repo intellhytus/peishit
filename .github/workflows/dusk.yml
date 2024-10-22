@@ -31,8 +31,10 @@ jobs:
           composer install
           php artisan key:generate
 
-      - name: Install Chromedriver
-        run: php artisan dusk:chrome-driver --detect
+      - name: Install Dusk
+        run: |
+          composer require --dev laravel/dusk
+          php artisan dusk:install
 
       - name: Run Migrations
         run: php artisan migrate --force
