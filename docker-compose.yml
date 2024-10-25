@@ -1,4 +1,12 @@
 services:
+    selenium:
+        image: 'selenium/standalone-chrome'
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        volumes:
+            - '/dev/shm:/dev/shm'
+        networks:
+            - sail
     projeto.test:
         build:
             context: ./vendor/laravel/sail/runtimes/8.2
@@ -22,10 +30,10 @@ services:
         volumes:
             - '.:/var/www/html'
         networks:
-            - base_sail
+            - takeout
 networks:
-    base_sail:
+    sail:
+        driver: bridge
+    takeout:
+        name: takeout
         external: true
-volumes:
-    sail-pgsql:
-        driver: local
