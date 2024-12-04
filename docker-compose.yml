@@ -6,7 +6,7 @@ services:
         volumes:
             - '/dev/shm:/dev/shm'
         networks:
-            - sail
+            - takeout
     projeto.test:
         build:
             context: ./vendor/laravel/sail/runtimes/8.2
@@ -32,8 +32,6 @@ services:
         networks:
             - takeout
 networks:
-    sail:
-        driver: bridge
     takeout:
         name: takeout
         external: true

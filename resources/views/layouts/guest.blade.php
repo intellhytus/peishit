@@ -13,13 +13,14 @@
 
     <!-- Scripts -->
     {{--        <link rel="stylesheet" href="{{asset('css/app.css')}}">--}}
+    <wireui:scripts />
+    <script src="//unpkg.com/alpinejs" defer></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="">
 
-<div class="">
-
-    <div class="">
+<div class="py-12 bg-gray-700 min-h-screen">
+    <div style="margin-top: -100px" class="">
         {{ $slot }}
     </div>
 </div>

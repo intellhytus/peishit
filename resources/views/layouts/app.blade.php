@@ -13,6 +13,9 @@
 
         <!-- Scripts -->
 {{--        <link rel="stylesheet" href='{{asset('css/app.css')}}'>--}}
+        <wireui:scripts />
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+        <script src="//unpkg.com/alpinejs" defer></script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">

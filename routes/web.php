@@ -8,10 +8,6 @@ Route::get('/chirps',[\App\Http\Controllers\ChirpController::class,'index'])
     ->middleware(['auth'])
     ->name('chirps');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth'])
-    ->name('dashboard');
-
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');

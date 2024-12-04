@@ -6,12 +6,16 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "livewire/flux": "^1.0",
         "livewire/livewire": "^3.5",
-        "livewire/volt": "^1.0",
-        "ext-mbstring": "*",
-        "ext-curl": "*"
+        "livewire/volt": "^1.6",
+        "pusher/pusher-php-server": "^7.2",
+        "robsontenorio/mary": "^1.41",
+        "wireui/wireui": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -66,6 +70,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

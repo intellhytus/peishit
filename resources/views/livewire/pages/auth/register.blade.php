@@ -32,11 +32,11 @@ new #[Layout('layouts.guest')] class extends Component
 
         Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        $this->redirect(route('chirps', absolute: false), navigate: true);
     }
 }; ?>
 
-<section class="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
+<section class="dark:bg-gray-900 min-h-screen flex items-center justify-center py-12 bg-gray-700 min-h-screen">
     <div class="w-full max-w-md bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">

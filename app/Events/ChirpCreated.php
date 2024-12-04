@@ -8,10 +8,11 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ChirpCreated
+class ChirpCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -31,7 +32,17 @@ class ChirpCreated
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new Channel('chirps'),
+        ];
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->chirp->id,
+            'message' => $this->chirp->message,
+            'user' => $this->chirp->user->name,
+            'created_at' => $this->chirp->created_at->toDateTimeString(),
         ];
     }
 }
