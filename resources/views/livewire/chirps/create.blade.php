@@ -13,6 +13,7 @@ new class extends Component {
             return; // Evita múltiplas requisições simultâneas
         }
         $this->isSubmitting=true;
+
         $validated = $this->validate([
             'message' => 'required|string|max:255',
         ]);
@@ -32,7 +33,6 @@ new class extends Component {
         <textarea wire:model="message"
                   placeholder="{{'Poste um Peixe!F'}}"
                   class="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
-                  name="chirp"
         ></textarea>
 
         <x-input-error :messages="$errors->get('message')" class="mt-2" />
