@@ -24,6 +24,7 @@ new #[Layout('layouts.guest')] class extends Component {
     }
 } ?>
 
+
     <!-- component -->
 
 <!-- component -->

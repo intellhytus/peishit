@@ -32,7 +32,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         Auth::login($user);
 
-        $this->redirect(route('chirps', absolute: false), navigate: true);
+        $this->redirect(route('chirps'));
     }
 }; ?>
 
@@ -43,7 +43,8 @@ new #[Layout('layouts.guest')] class extends Component
                 Criar uma conta
             </h1>
 
-            <form wire:submit.prevent="register" class="space-y-4 md:space-y-6">
+            <form wire:submit.prevent="register" method="POST" class="space-y-4 md:space-y-6">
+                @csrf
                 <!-- Nome -->
                 <div>
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>

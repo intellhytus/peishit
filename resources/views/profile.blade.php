@@ -6,7 +6,8 @@
             <!-- Profile Photo Section -->
             <div class="p-4 sm:p-8 bg-gray-900 shadow border border-gray-800 rounded-2xl flex items-center space-x-6">
                 <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-800">
-                    <img src="https://i.pinimg.com/474x/d5/c8/eb/d5c8ebdfa1eb3ec56d3c284577f3a1c6.jpg" alt="{{ Auth::user()->name }}" class="object-cover w-full h-full">
+                    <livewire:profile-photo-upload />
+                    <button wire:click="salvarFoto" class="btn btn-primary mt-4">Salvar Foto</button>
 
                 </div>
                 <div class="flex flex-col items-center space-y-4">
@@ -14,7 +15,6 @@
                     <p class="text-sm text-gray-400">{{ Auth::user()->email }}</p>
 
                     <!-- Upload Button -->
-                    <livewire:profile-photo-upload />
 
                 </div>
             </div>
