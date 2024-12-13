@@ -84,9 +84,35 @@ new class extends Component {
                             <small class="text-sm text-gray-600"> &middot; {{ __('edited') }}</small>
                         @endunless
                     </div>
+                    @if ($chirp->user->is(auth()->user()))
+                        <!-- Dropdown -->
+                        <div class="relative">
+                            <button onclick="toggleDropdown('dropdown-{{ $chirp->id }}')" class="focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                </svg>
+                            </button>
+                            <div id="dropdown-{{ $chirp->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-50">
+                                <button wire:click="edit({{ $chirp->id }})"
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    {{ __('Edit') }}
+                                </button>
+                                <button wire:click="delete({{ $chirp->id }})"
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    {{ __('Delete') }}
+                                </button>
+                            </div>
+                        </div>
+                    @endif
                 </div>
-                    <!-- Botão de comentar -->
-                    <button wire:click="toggleComments({{ $chirp->id }})" style="margin-left: 90%; margin-bottom: 15px; border: none">
+                <div>
+                    @if ($chirp->is($editing))
+                        <livewire:chirps.edit :chirp="$chirp" :key="$chirp->id" />
+                    @else
+                        <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
+                    @endif
+                <!-- Botão de comentar -->
+                    <button wire:click="toggleComments({{ $chirp->id }})" style="margin-left: 90%; border: none">
                         <svg
                             stroke-linejoin="round"
                             stroke-linecap="round"
@@ -107,7 +133,7 @@ new class extends Component {
                         </svg>
                         {{ $chirp->comments->count() }}
                     </button>
-
+                </div>
                 <!-- Exibição dos comentários -->
                 @if ($chirp->is($commenting))
                     <div class="mt-4 bg-gray-100 p-4 rounded-lg">
