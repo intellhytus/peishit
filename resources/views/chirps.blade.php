@@ -1,4 +1,8 @@
 <title>Peishit</title>
+<head>
+    wireui:scripts />
+    <script src="//unpkg.com/alpinejs" defer></script
+</head>
 <x-app-layout>
     <div class="py-12 bg-gray-700 min-h-screen">
         <div class="max-w-2xl mx-auto sm:p-6 lg:p-8">

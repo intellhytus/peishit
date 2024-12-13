@@ -9,6 +9,7 @@ new class extends Component {
     public Collection $chirps;
 
     public ?Chirp $editing = null;
+    public ?Chirp $commenting = null;
 
     public function mount(): void
     {
@@ -20,6 +21,26 @@ new class extends Component {
         $this->chirps = Chirp::with('user')
             ->latest()
             ->get();
+    }
+    //adicionado comentário
+    public function toggleComments(Chirp $chirp): void
+    {
+        // Alterna entre mostrar e esconder os comentários
+        if ($this->commenting && $this->commenting->is($chirp)) {
+            $this->commenting = null; // Se o chirp já está sendo comentado, fecha a área de comentários
+        } else {
+            $this->commenting = $chirp; // Caso contrário, exibe os comentários do chirp atual
+        }
+    }
+
+    public function addComment(Chirp $chirp, string $message): void
+    {
+        $chirp->comments()->create([
+            'user_id' => auth()->id(),
+            'message' => $message,
+        ]);
+
+        $this->getChirps(); // Atualiza a lista de posts e comentários
     }
 
     public function edit(Chirp $chirp): void
@@ -52,9 +73,8 @@ new class extends Component {
 <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
     @foreach ($chirps as $chirp)
         <div class="p-6 flex space-x-2" wire:key="chirp-{{ $chirp->id }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+            <!-- Outras informações do Chirp -->
+            <x-icon name="user-circle" class="w-5 h-5" />
             <div class="flex-1">
                 <div class="flex justify-between items-center">
                     <div>
@@ -64,36 +84,63 @@ new class extends Component {
                             <small class="text-sm text-gray-600"> &middot; {{ __('edited') }}</small>
                         @endunless
                     </div>
-                    @if ($chirp->user->is(auth()->user()))
-                        <!-- Dropdown -->
-                        <div class="relative">
-                            <button onclick="toggleDropdown('dropdown-{{ $chirp->id }}')" class="focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                </svg>
-                            </button>
-                            <div id="dropdown-{{ $chirp->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-50">
-                                <button wire:click="edit({{ $chirp->id }})"
-                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    {{ __('Edit') }}
-                                </button>
-                                <button wire:click="delete({{ $chirp->id }})"
-                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    {{ __('Delete') }}
-                                </button>
-                            </div>
-                        </div>
-                    @endif
                 </div>
-                @if ($chirp->is($editing))
-                    <livewire:chirps.edit :chirp="$chirp" :key="$chirp->id" />
-                @else
-                    <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
+                    <!-- Botão de comentar -->
+                    <button wire:click="toggleComments({{ $chirp->id }})" style="margin-left: 90%; margin-bottom: 15px; border: none">
+                        <svg
+                            stroke-linejoin="round"
+                            stroke-linecap="round"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            height="44"
+                            width="44"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-8 hover:scale-125 duration-200 hover:stroke-blue-500"
+                            fill="none"
+                        >
+                            <path fill="none" d="M0 0h24v24H0z" stroke="none"></path>
+                            <path d="M8 9h8"></path>
+                            <path d="M8 13h6"></path>
+                            <path
+                                d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"
+                            ></path>
+                        </svg>
+                        {{ $chirp->comments->count() }}
+                    </button>
+
+                <!-- Exibição dos comentários -->
+                @if ($chirp->is($commenting))
+                    <div class="mt-4 bg-gray-100 p-4 rounded-lg">
+                        <!-- Lista de comentários -->
+                        @foreach ($chirp->comments as $comment)
+                            <div class="mb-2">
+                                <strong>{{ $comment->user->name }}</strong>
+                                <p class="text-sm text-gray-700">{{ $comment->message }}</p>
+                            </div>
+                        @endforeach
+
+                        <!-- Formulário para adicionar novo comentário -->
+                        <form wire:submit.prevent="addComment({{ $chirp->id }}, $event.target.message.value)">
+                            <div class="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                <div class="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
+                                    <label for="comment" class="sr-only">Your comment</label>
+                                    <textarea name="message" rows="2" class="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400" placeholder="Diga aí, irmão" required></textarea>
+                                    <x-input-error :messages="$errors->get('message')" class="mt-2" />
+                                </div>
+                                <div class="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
+                                    <x-primary-button type="submit" class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
+                                        {{ __('Comment') }}
+                                    </x-primary-button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 @endif
             </div>
         </div>
     @endforeach
 </div>
+
 
 <script>
     function toggleDropdown(id) {
