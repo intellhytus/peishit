@@ -44,19 +44,9 @@
         <!-- Main Content -->
         <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-
-                <!-- Profile Photo Section -->
-                <div class="p-4 sm:p-8 bg-gray-900 shadow border border-gray-800 rounded-2xl flex items-center space-x-6">
-                    <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-800">
-                        <livewire:profile-photo-upload />
-                        <button wire:click="salvarFoto" class="btn btn-primary mt-4">Salvar Foto</button>
-                    </div>
-                    <div class="flex flex-col items-center space-y-4">
-                        <h3 class="text-lg font-semibold text-gray-100">{{ Auth::user()->name }}</h3>
-                        <p class="text-sm text-gray-400">{{ Auth::user()->email }}</p>
-                    </div>
+                <div>
+                    <livewire:upload-photos />
                 </div>
-
                 <!-- Update Profile Information Form -->
                 <div class="p-4 sm:p-8 bg-gray-900 shadow border border-gray-800 rounded-2xl">
                     <div class="max-w-xl">
