@@ -13,14 +13,26 @@ new #[Layout('layouts.guest')] class extends Component {
     /**
      * Handle an incoming authentication request.
      */
+    public function render():mixed
+    {
+        return view('livewire.pages.auth.login');
+    }
     public function login(): void
     {
         $validated = $this->validate([
-            'form.email' => ['required', 'string'],
+            'form.email' => ['required', 'string', 'email'],
             'form.password' => ['required', 'string'],
         ]);
-        $this->form->authenticate($validated);
-        $this->redirect(route('chirps'));
+
+        // Tenta autenticar o usuário
+        if (Auth::attempt(['email' => $this->form->email, 'password' => $this->form->password], $this->form->remember ?? false)) {
+            // Redireciona para a página inicial
+            session()->flash('success', 'Login bem-sucedido!');
+            $this->redirect(route('chirps'));
+        } else {
+            session()->flash('error', 'Sua sessão expirou. Faça login novamente.');
+            redirect(route('login'));
+        }
     }
 } ?>
 
@@ -32,9 +44,17 @@ new #[Layout('layouts.guest')] class extends Component {
 <!-- component -->
 <body class="bg-gray-700 ">
 <div class="flex min-h-screen items-center justify-center">
-    <form wire:submit.prevent="login" class="min-h-1/2 bg-gray-900  border border-gray-900 rounded-2xl ">
+    <form wire:submit.prevent="login" wire:key="login-form" class="min-h-1/2 bg-gray-900  border border-gray-900 rounded-2xl ">
         <div class="min-h-1/2 bg-gray-900  border border-gray-900 rounded-2xl">
-
+            @if(\session()->has('error'))
+                <div style="padding: 30px">
+                    <x-alert title="Error Message!" negative padding="small">
+                        <x-slot name="slot">
+                            Credenciais não válidas! <b>Faça login novamente</b>
+                        </x-slot>
+                    </x-alert>
+                </div>
+            @endif
             <div
                 class="mx-4 sm:mx-24 md:mx-34 lg:mx-56 mx-auto  flex items-center space-y-4 py-16 font-semibold text-gray-500 flex-col">
                 <svg viewBox="0 0 24 24" class=" h-12 w-12 text-white" fill="currentColor">
